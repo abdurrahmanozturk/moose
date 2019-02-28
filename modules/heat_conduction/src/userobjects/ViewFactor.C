@@ -46,8 +46,6 @@ ViewFactor::execute()
   if (dim!=3)
     mooseError("ViewFactor UserObject can only be used for 3D geometry.");
 
-  // LOOPING OVER ELEMENTS ON THE MASTER BOUNDARY
-  // Define IDs
   Real viewfactor_elem_to_bnd{0};
   BoundaryID slave_bnd;
   BoundaryID master_bnd = _mesh.getBoundaryIDs(_current_elem, _current_side)[0];
@@ -56,7 +54,6 @@ ViewFactor::execute()
   for (const auto & elem : _elem_side_map)
   {
     unsigned int slave_elem = elem.first;   //slave_elem id el->id()
-    // std::cout<<"master elem:"<<master_elem<<"-> slave elem:"<<slave_elem<<std::endl;
     // if (master_elem == slave_elem)     //element can not see itself
     //   continue;
     Elem * el = _mesh.elemPtr(elem.first);  //elem ptr for slave elem
@@ -69,11 +66,8 @@ ViewFactor::execute()
       Real slave_side_area = getArea(getCenterPoint(_slave_side_map),_slave_side_map);
       Real afsm = slave_side_area/master_side_area;
       Real Fsm = _viewfactors_map[slave_bnd][master_bnd][slave_elem][master_elem];
-      // std::cout<<"F_master-slave:"<<Fsm<<std::endl;
       _viewfactors_map[master_bnd][slave_bnd][master_elem][slave_elem] = afsm * Fsm;
       viewfactor_elem_to_bnd += afsm * Fsm;
-      // std::cout<<"F_slave-master:"<<(afsm*Fsm)<<std::endl;
-      // std::cout<<"F_slave-master:"<<_viewfactors_map[master_bnd][slave_bnd][master_elem][slave_elem]<<std::endl;
     }
     else
     {
@@ -94,9 +88,7 @@ ViewFactor::execute()
         viewfactor_elem_to_bnd += 0;
       }
     }
-    // std::cout<<"F["<<master_elem<<"]["<<slave_elem<<"]= "<<_viewfactors_map[master_bnd][slave_bnd][master_elem][slave_elem]<<std::endl;
   }
-  // std::cout<<"Fsum="<<viewfactor_elem_to_bnd<<std::endl;
 }
 
 void
