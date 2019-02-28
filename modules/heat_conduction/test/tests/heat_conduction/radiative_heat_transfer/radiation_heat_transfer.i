@@ -51,8 +51,8 @@
   [./RadiationHeatTransfer]
     type = RadiativeHeatFluxBC
     variable = temp
-    boundary = '2 7'
-    emissivity = '1 1'
+    boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
+    emissivity = '1 1 1 1'
     viewfactor_userobject = ViewFactor
   [../]
   # [./RadiativeBC]
@@ -83,7 +83,7 @@
 [UserObjects]
   [./ViewFactor]
     type = ViewFactor
-    boundary = '2 7'
+    boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
     method = MONTECARLO
     sampling_number = 10
     source_number = 10
@@ -92,24 +92,24 @@
   [../]
 []
 [Postprocessors]
-  [./boundarytemp_1]
+  [./block1_x1_temp]
     type = SideAverageValue
-    boundary = '1'
+    boundary = 'block1_x1'
     variable = temp
   [../]
-  [./boundarytemp_2]
+  [./block1_x2_temp]
     type = SideAverageValue
-    boundary = '2'
+    boundary = 'block1_x2'
     variable = temp
   [../]
-  [./boundarytemp_7]
+  [./block2_x2_temp]
     type = SideAverageValue
-    boundary = '7'
+    boundary = 'block2_x2'
     variable = temp
   [../]
-  [./boundarytemp_9]
+  [./block3_x2_temp]
     type = SideAverageValue
-    boundary = '9'
+    boundary = 'block3_x2'
     variable = temp
   [../]
 []
