@@ -87,11 +87,31 @@
     method = MONTECARLO
     sampling_number = 10
     source_number = 10
-    print_screen = false
+    print_screen = true
     execute_on = INITIAL
   [../]
 []
 [Postprocessors]
+  [./boundarytemp_1]
+    type = SideAverageValue
+    boundary = '1'
+    variable = temp
+  [../]
+  [./boundarytemp_2]
+    type = SideAverageValue
+    boundary = '2'
+    variable = temp
+  [../]
+  [./boundarytemp_7]
+    type = SideAverageValue
+    boundary = '7'
+    variable = temp
+  [../]
+  [./boundarytemp_9]
+    type = SideAverageValue
+    boundary = '9'
+    variable = temp
+  [../]
 []
 
 [Outputs]

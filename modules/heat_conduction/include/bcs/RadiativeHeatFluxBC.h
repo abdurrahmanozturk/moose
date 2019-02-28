@@ -10,14 +10,10 @@ class RadiativeHeatFluxBC;
 template <>
 InputParameters validParams<RadiativeHeatFluxBC>();
 
-/**
- * Base class for deriving any boundary condition of a integrated type
- */
 class RadiativeHeatFluxBC : public IntegratedBC
 {
 public:
   RadiativeHeatFluxBC(const InputParameters & parameters);
-  const std::map<unsigned int, std::vector<Real>> getSideMap(const Elem * elem,const unsigned int side);
   const Real getArea(const Elem * elem,const unsigned int side);
 
 protected:

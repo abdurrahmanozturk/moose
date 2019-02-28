@@ -122,8 +122,8 @@ ViewFactorBase::getSideMap(const Elem * elem,const unsigned int side) const
   unsigned int n_n = elem_side->n_nodes();
   for (unsigned int i = 0; i < n_n; i++)
   {
-    const Node * node = elem_side->node_ptr(i);    //get nodes
-    for (unsigned int j = 0; j < 3; j++)         // Define nodal coordinates and normals
+    const Node * node = elem_side->node_ptr(i);
+    for (unsigned int j = 0; j < 3; j++)
     {
       side_map[i].push_back((*node)(j));
     }
