@@ -21,8 +21,6 @@ protected:
   virtual Real computeQpJacobian() override;
   const unsigned int _var_number;
   const System & _system;
-  // Point _point;
-  // Real _value;
 
 private:
   const ViewFactor & _viewfactor;
