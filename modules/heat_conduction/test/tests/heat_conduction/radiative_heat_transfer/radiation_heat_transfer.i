@@ -75,7 +75,7 @@
   type = Transient
   solve_type = PJFNK
   start_time = 0
-  end_time = 1
+  end_time = 10
   # dt = 1e-3
   dtmin = 1e-6
   nl_abs_tol = 1e-15
