@@ -1,7 +1,7 @@
 #include "UO2.h"
 #include "libmesh/quadrature.h"
 
-registerMooseObject("HeatConductionApp", UO2);
+// registerMooseObject("HeatConductionApp", UO2);
 
 template <>
 InputParameters

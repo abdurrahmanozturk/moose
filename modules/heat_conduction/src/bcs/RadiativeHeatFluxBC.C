@@ -1,7 +1,7 @@
 #include "RadiativeHeatFluxBC.h"
 #include "PenetrationLocator.h"
 
-registerMooseObject("HeatConductionApp", RadiativeHeatFluxBC);
+// registerMooseObject("HeatConductionApp", RadiativeHeatFluxBC);
 
 template <>
 InputParameters
@@ -83,9 +83,10 @@ RadiativeHeatFluxBC::computeQpResidual()
       // const std::vector<std::vector<OutputShape>> & phi = my_fe->get_phi();
       // T_slave = _variable->getValue(el, slave_side_phi);
       Real f_ms = _viewfactor.getViewFactor(current_boundary_id,_master_elem_id, bnd_id, _slave_elem_id);
-      Real f_sm = f_ms * (area_master / area_slave);
       q_ms = _emissivity[current_boundary_id] * _stefan_boltzmann * f_ms * temp_func_master; // master-slave
-      q_sm = _emissivity[bnd_id] * _stefan_boltzmann * f_sm * temp_func_slave;  // slave-master
+      q_sm = _emissivity[bnd_id] * _stefan_boltzmann * f_ms * temp_func_slave;  // slave-master :  from Modest
+      // Real f_sm = f_ms * (area_master / area_slave);
+      // q_sm = _emissivity[bnd_id] * _stefan_boltzmann * f_sm * temp_func_slave;  // slave-master
       q_net += q_ms - q_sm;
     }
   }
@@ -95,13 +96,13 @@ RadiativeHeatFluxBC::computeQpResidual()
 Real
 RadiativeHeatFluxBC::computeQpJacobian()
 {
-  Real dq_net{0.0};
-  BoundaryID current_boundary_id = _mesh.getBoundaryIDs(_current_elem, _current_side)[0];
-  if (_boundary_ids.find(current_boundary_id)!=_boundary_ids.end())
-  {
-    Real dtemp_func_master = 4 * _phi[_j][_qp] * _u[_qp] * _u[_qp] * _u[_qp];
-    dq_net = _stefan_boltzmann * dtemp_func_master; // black body
-  }
-  return _test[_i][_qp] * dq_net;
+  // Real dq_net{0.0};
+  // BoundaryID current_boundary_id = _mesh.getBoundaryIDs(_current_elem, _current_side)[0];
+  // if (_boundary_ids.find(current_boundary_id)!=_boundary_ids.end())
+  // {
+  //   Real dtemp_func_master = 4 * _phi[_j][_qp] * _u[_qp] * _u[_qp] * _u[_qp];
+  //   dq_net = _stefan_boltzmann * dtemp_func_master; // black body
+  // }
+  // return _test[_i][_qp] * dq_net;
   return 0;
 }

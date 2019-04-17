@@ -1,7 +1,7 @@
 #radiation heat transfer calculations for 2 parallel blocks
 [Mesh]
   type = FileMesh
-  file = parallel_blocks.e
+  file = cylinder.e
   # type = GeneratedMesh
   # xmax = 1
   # xmin = 0
@@ -18,7 +18,7 @@
 
 [Variables]
   [./temp]
-    initial_condition = 500
+    initial_condition = 400
   [../]
 []
 
@@ -28,37 +28,37 @@
     variable = temp
     diffusion_coefficient = thermal_conductivity
   [../]
-  [./TimeDerivative]
-    type = TimeDerivative
-    variable = temp
-  []
-  [./HeatSource]
-    type = HeatSource
-    variable = temp
-    value = 100
-    block = 'block1'
-  [../]
+  # [./TimeDerivative]
+  #   type = TimeDerivative
+  #   variable = temp
+  # []
+  # [./HeatSource]
+  #   type = HeatSource
+  #   variable = temp
+  #   value = 1440
+  #   block = 'innercylinder'
+  # [../]
 []
 [BCs]
-  [./master]
-    type = DirichletBC
-    value = 500 #K
-    variable = temp
-    boundary = block3_x2
-  [../]
+  # [./master]
+  #   type = DirichletBC
+  #   value = 400 #K
+  #   variable = temp
+  #   boundary = 5
+  # [../]
   # [./slave]
   #   type = DirichletBC
   #   value = 900 #K
   #   variable = temp
   #   boundary = 7
   # [../]
-  [./RadiationHeatTransfer]
-    type = RadiativeHeatFluxBC
-    variable = temp
-    boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
-    emissivity = '1 1 1 1'
-    viewfactor_userobject = ViewFactor
-  [../]
+  # [./RadiationHeatTransfer]
+  #   type = RadiativeHeatFluxBC
+  #   variable = temp
+  #   boundary = '5 2'
+  #   emissivity = '1 1'
+  #   viewfactor_userobject = ViewFactor
+  # [../]
   # [./RadiativeBC]
   #   type = RadiativeBC
   #   variable = temp
@@ -76,50 +76,51 @@
   [../]
 []
 [Executioner]
-  type = Transient
+  type = Steady
   solve_type = PJFNK
-  start_time = 0
-  end_time = 10
-  # dt = 1e-3
-  dtmin = 1e-6
-  nl_abs_tol = 1e-15
+  # start_time = 0
+  # end_time = 10
+  # # dt = 1e-3
+  # dtmin = 1e-6
+  # nl_abs_tol = 1e-15
 []
 [UserObjects]
   [./ViewFactor]
     type = ViewFactor
-    boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
+    boundary = '5 2'
     method = MONTECARLO
     sampling_number = 10
     source_number = 10
     print_screen = true
+    debug_mode = false
     execute_on = INITIAL
   [../]
 []
 [Postprocessors]
-  [./block1_x1_temp]
+  [./pellet_top]
     type = SideAverageValue
-    boundary = 'block1_x1'
+    boundary = '1'
     variable = temp
   [../]
-  [./block1_x2_temp]
+  [./pellet_bottom]
     type = SideAverageValue
-    boundary = 'block1_x2'
+    boundary = '2'
     variable = temp
   [../]
-  [./block2_x2_temp]
+  [./wall_bottom]
     type = SideAverageValue
-    boundary = 'block2_x2'
+    boundary = '5'
     variable = temp
   [../]
-  [./block3_x2_temp]
+  [./wall_top]
     type = SideAverageValue
-    boundary = 'block3_x2'
+    boundary = '7'
     variable = temp
   [../]
 []
 
 [Outputs]
   exodus = true
-  file_base = radiation_heat_transfer
+  file_base = experiment_out
   console = true
 []

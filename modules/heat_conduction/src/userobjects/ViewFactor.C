@@ -1,7 +1,7 @@
 #include "ViewFactorBase.h"
 #include "ViewFactor.h"
 
-registerMooseObject("HeatConductionApp", ViewFactor);
+// registerMooseObject("HeatConductionApp", ViewFactor);
 
 template <>
 InputParameters
@@ -77,7 +77,7 @@ ViewFactor::execute()
         if (_method=="MONTECARLO")
           viewfactor_elem_to_elem = doMonteCarlo(_master_side_map,_slave_side_map,_sourceNumber,_samplingNumber);
         else
-          mooseError("Undefined method for view factor calculations.");
+          mooseError("Unknown method for view factor calculations.");
         _viewfactors_map[master_bnd][slave_bnd][master_elem][slave_elem] = viewfactor_elem_to_elem;
         viewfactor_elem_to_bnd += viewfactor_elem_to_elem;
       }
