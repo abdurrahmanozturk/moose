@@ -16,7 +16,7 @@ public:
   virtual void initialize() override;
   virtual void execute() override;
   virtual void finalize() override;
-  virtual void threadJoin(const UserObject & y) override;// {}
+  virtual void threadJoin(const UserObject & y) override {}
 
   virtual Real getViewFactor(BoundaryID master_bnd, unsigned int master_elem,
                              BoundaryID slave_bnd, unsigned int slave_elem) const;
@@ -28,7 +28,6 @@ protected:
   std::map<unsigned int, unsigned int> _elem_side_map;
   std::map<unsigned int, std::vector<Real>> _master_side_map;
   std::map<unsigned int, std::vector<Real>> _slave_side_map;
-
 };
 
 #endif // VIEWFACTOR_H

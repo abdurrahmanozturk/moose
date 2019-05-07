@@ -92,41 +92,10 @@ ViewFactor::execute()
 }
 
 void
-ViewFactor::threadJoin(const UserObject & y)
-{
-  const ViewFactor & vf = dynamic_cast<const ViewFactor &>(y);
-  for (auto it1 : vf._viewfactors_map)
-    for (auto it2 : it1.second)
-      for (auto it3 : it2.second)
-        for (auto it4 : it3.second)
-          _viewfactors_map[it1.first][it2.first][it3.first][it4.first]=it4.second;
-}
-
-void
 ViewFactor::finalize()
 {
   std::cout << "done." << std::endl;
   std::cout << "------------------------" << std::endl;
-  if (_printScreen==true)
-    printViewFactors();
-  // std::cout<<"------------"<<std::endl;
-  // std::cout<<"ViewFactors:"<<std::endl;
-  // for (auto it1 : _viewfactors_map)
-  //   for (auto it2 : it1.second)
-  //     for (auto it3 : it2.second)
-  //       for (auto it4 : it3.second)
-  //         {
-  //           gatherSum(it4.second);
-  //         }
-  for (auto it1 : _viewfactors_map)
-    for (auto it2 : it1.second)
-      for (auto it3 : it2.second)
-        for (auto it4 : it3.second)
-          {
-            // std::cout<<"map size ="<<_viewfactors_map.size()*it1.second.size()*it2.second.size()*it3.second.size()<<std::endl;
-            Real vf = _viewfactors_map[it1.first][it2.first][it3.first][it4.first]=it4.second;
-            // std::cout<<"F["<<it1.first<<"]["<<it2.first<<"]["<<it3.first<<"]["<<it4.first<<"] = "<<vf<<std::endl;
-          }
 }
 
 Real ViewFactor::getViewFactor(BoundaryID master_bnd, unsigned int master_elem, BoundaryID slave_bnd, unsigned int slave_elem) const
@@ -140,6 +109,6 @@ Real ViewFactor::getViewFactor(BoundaryID master_bnd, unsigned int master_elem, 
     else
       mooseError("Viewfactor requested for unknown slave boundary. Make sure UserObject is executed on INITIAL and boundaries are defined correctly in UserObject block.");
   }
-  mooseError("Viewfactor requested for unknown slave boundary. Make sure UserObject is executed on INITIAL and boundaries are defined correctly in UserObject block.");
+  mooseError("Viewfactor requested for unknown master boundary. Make sure UserObject is executed on INITIAL and boundaries are defined correctly in UserObject block.");
   return 0;   //satisfy compiler
 }
