@@ -1,7 +1,7 @@
 #include "RadiativeHeatFluxBC.h"
 #include "PenetrationLocator.h"
 
-// registerMooseObject("HeatConductionApp", RadiativeHeatFluxBC);
+registerMooseObject("HeatConductionApp", RadiativeHeatFluxBC);
 
 template <>
 InputParameters
@@ -10,10 +10,16 @@ validParams<RadiativeHeatFluxBC>()
   InputParameters params = validParams<IntegratedBC>();
   params.addClassDescription("Radiation Heat Transfer BC Model with view factors.");
   params.addRequiredParam<UserObjectName>("viewfactor_userobject",
-      "The name of the UserObject that is used for view factor calculations.");
-  params.addParam<Real>(
-      "stefan_boltzmann", 5.670367e-8, "The Stefan-Boltzmann constant [kg.s^3.K^4].");
-  params.addRequiredParam<std::vector<Real>>("emissivity","The emissivities of boundaries (sort by ids).");
+                                          "The name of the UserObject that is "
+                                          "used for view factor calculations.");
+  params.addParam<Real>("stefan_boltzmann",
+                        5.670367e-8,
+                        "The Stefan-Boltzmann constant [kg.s^3.K^4].");
+  params.addParam<std::vector<Real>>("emissivity","The emissivities of boundaries (sort by ids).");
+  params.addParam<Real>("ambient_temperature",
+                        300,
+                        "Ambient Temperature(in K) to calculate "
+                        "radiative heat loss from a surface.");
   return params;
 }
 
@@ -28,7 +34,9 @@ RadiativeHeatFluxBC::RadiativeHeatFluxBC(const InputParameters & parameters)
     _boundary_ids(boundaryIDs()),
     _master_boundary_ids(_viewfactor.getMasterBoundaries()),
     _slave_boundary_ids(_viewfactor.getSlaveBoundaries()),
-    _stefan_boltzmann(getParam<Real>("stefan_boltzmann"))
+    _stefan_boltzmann(getParam<Real>("stefan_boltzmann")),
+    _ambient_temp(getParam<Real>("ambient_temperature")),
+    _heat_loss(isParamValid("ambient_temperature") && (_boundary_ids.size() == 1))
 {
   std::vector<Real> emissivity = getParam<std::vector<Real>>("emissivity");
   if (emissivity.size()!=_boundary_ids.size())
@@ -65,29 +73,33 @@ RadiativeHeatFluxBC::computeQpResidual()
   {
     _master_elem_id = _current_elem->id();
     Real area_master = getArea(_current_elem,_current_side);
-    for (const auto & elem : _elem_side_map)
+    if (_heat_loss)
     {
-      Elem * el = _mesh.elemPtr(elem.first);
-      unsigned int side = elem.second;
-      BoundaryID bnd_id = _mesh.getBoundaryIDs(el,side)[0];
-      _slave_elem_id = el->id();   //elem.first
-      if (_master_elem_id == _slave_elem_id)
-        continue;
-      Real area_slave = getArea(el,side);
-      std::map<unsigned int, std::vector<Real>> side_map{_viewfactor.getSideMap(el,side)};
-      const std::vector<Real> center = _viewfactor.getCenterPoint(side_map);
-      const Point point(center[0],center[1],center[2]);
-      _u_slave = _system.point_value(_var_number, point, false);
-      Real temp_func_slave = _u_slave * _u_slave * _u_slave * _u_slave;
-      // const unsigned int Dim = el->dim();
-      // const std::vector<std::vector<OutputShape>> & phi = my_fe->get_phi();
-      // T_slave = _variable->getValue(el, slave_side_phi);
-      Real f_ms = _viewfactor.getViewFactor(current_boundary_id,_master_elem_id, bnd_id, _slave_elem_id);
-      q_ms = _emissivity[current_boundary_id] * _stefan_boltzmann * f_ms * temp_func_master; // master-slave
-      q_sm = _emissivity[bnd_id] * _stefan_boltzmann * f_ms * temp_func_slave;  // slave-master :  from Modest
-      // Real f_sm = f_ms * (area_master / area_slave);
-      // q_sm = _emissivity[bnd_id] * _stefan_boltzmann * f_sm * temp_func_slave;  // slave-master
-      q_net += q_ms - q_sm;
+      Real temp_func_ambient = _ambient_temp * _ambient_temp * _ambient_temp * _ambient_temp;
+      q_net = _emissivity[current_boundary_id] * _stefan_boltzmann *
+              (temp_func_master - temp_func_ambient); // master-ambient
+    }
+    else
+    {
+      for (const auto & elem : _elem_side_map)
+      {
+        Elem * el = _mesh.elemPtr(elem.first);
+        unsigned int side = elem.second;
+        BoundaryID bnd_id = _mesh.getBoundaryIDs(el,side)[0];
+        _slave_elem_id = el->id();   //elem.first
+        if (_master_elem_id == _slave_elem_id)
+          continue;
+        Real area_slave = getArea(el,side);
+        std::map<unsigned int, std::vector<Real>> side_map{_viewfactor.getSideMap(el,side)};
+        const std::vector<Real> center = _viewfactor.getCenterPoint(side_map);
+        const Point point(center[0],center[1],center[2]);
+        _u_slave = _system.point_value(_var_number, point, false);
+        Real temp_func_slave = _u_slave * _u_slave * _u_slave * _u_slave;
+        Real f_ms = _viewfactor.getViewFactor(current_boundary_id,_master_elem_id, bnd_id, _slave_elem_id);
+        q_ms = _emissivity[current_boundary_id] * _stefan_boltzmann * f_ms * temp_func_master; // master-slave : from Modest
+        q_sm = _emissivity[bnd_id] * _stefan_boltzmann * f_ms * temp_func_slave;  // slave-master :  from Modest
+        q_net += q_ms - q_sm;
+      }
     }
   }
   return _test[_i][_qp] * q_net;
