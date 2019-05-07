@@ -1,7 +1,7 @@
 #include "ViewFactorBase.h"
 #include "ViewFactor.h"
 
-// registerMooseObject("HeatConductionApp", ViewFactor);
+registerMooseObject("HeatConductionApp", ViewFactor);
 
 template <>
 InputParameters

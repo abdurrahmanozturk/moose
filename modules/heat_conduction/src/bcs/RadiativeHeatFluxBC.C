@@ -55,14 +55,6 @@ RadiativeHeatFluxBC::RadiativeHeatFluxBC(const InputParameters & parameters)
   }
 }
 
-const Real
-RadiativeHeatFluxBC::getArea(const Elem * elem,const unsigned int side)
-{
-  std::map<unsigned int, std::vector<Real>> side_map{_viewfactor.getSideMap(elem,side)};
-  const std::vector<Real> side_center = _viewfactor.getCenterPoint(side_map);
-  return _viewfactor.getArea(side_center,side_map);
-}
-
 Real
 RadiativeHeatFluxBC::computeQpResidual()
 {
@@ -72,7 +64,6 @@ RadiativeHeatFluxBC::computeQpResidual()
   if (_boundary_ids.find(current_boundary_id)!=_boundary_ids.end())
   {
     _master_elem_id = _current_elem->id();
-    Real area_master = getArea(_current_elem,_current_side);
     if (_heat_loss)
     {
       Real temp_func_ambient = _ambient_temp * _ambient_temp * _ambient_temp * _ambient_temp;
@@ -89,7 +80,6 @@ RadiativeHeatFluxBC::computeQpResidual()
         _slave_elem_id = el->id();   //elem.first
         if (_master_elem_id == _slave_elem_id)
           continue;
-        Real area_slave = getArea(el,side);
         std::map<unsigned int, std::vector<Real>> side_map{_viewfactor.getSideMap(el,side)};
         const std::vector<Real> center = _viewfactor.getCenterPoint(side_map);
         const Point point(center[0],center[1],center[2]);
