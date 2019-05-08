@@ -31,13 +31,13 @@
   #   variable = temp
   #   boundary = block3_x2
   # [../]
-  [./RadiationHeatTransferBC]
-    type = RadiativeHeatFluxBC
-    boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
-    viewfactor_userobject = ViewFactor
-    emissivity = '1 1 1 1'
-    variable = temp
-  [../]
+  # [./RadiationHeatTransferBC]
+  #   type = RadiativeHeatFluxBC
+  #   boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
+  #   viewfactor_userobject = ViewFactor
+  #   emissivity = '1 1 1 1'
+  #   variable = temp
+  # [../]
   [./RadiationHeatTransferHeatLoss]
     type = RadiativeHeatFluxBC
     boundary = block3_x2
@@ -45,6 +45,26 @@
     viewfactor_userobject = ViewFactor
     variable = temp
     ambient_temperature = 320
+  [../]
+[]
+[ThermalContact]
+  [./radht1]
+    type = GapHeatTransfer
+    variable = temp
+    master = block1_x2
+    slave = block2_x1
+    gap_conductivity = 0.0
+    emissivity_1 = 1
+    emissivity_2 = 1
+  [../]
+  [./radht2]
+    type = GapHeatTransfer
+    variable = temp
+    master = block2_x2
+    slave = block3_x1
+    gap_conductivity = 0.0
+    emissivity_1 = 1
+    emissivity_2 = 1
   [../]
 []
 [Materials]
@@ -66,7 +86,8 @@
 [UserObjects]
   [./ViewFactor]
     type = ViewFactor
-    boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
+    boundary = block1_x2
+    # boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
     method = MONTECARLO
     sampling_number = 100
     source_number = 100
@@ -109,6 +130,6 @@
 
 [Outputs]
   exodus = true
-  file_base = parallel_blocks_out
+  file_base = parallel_blocks_gapmodel_out
   console = true
 []

@@ -96,6 +96,8 @@ ViewFactor::finalize()
 {
   std::cout << "done." << std::endl;
   std::cout << "------------------------" << std::endl;
+  if (_printScreen==true)
+    printViewFactors();
 }
 
 Real ViewFactor::getViewFactor(BoundaryID master_bnd, unsigned int master_elem, BoundaryID slave_bnd, unsigned int slave_elem) const
