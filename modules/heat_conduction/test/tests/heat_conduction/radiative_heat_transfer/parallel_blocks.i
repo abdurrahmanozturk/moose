@@ -68,7 +68,7 @@
     type = ViewFactor
     boundary = 'block1_x2 block2_x1 block2_x2 block3_x1'
     method = MONTECARLO
-    sampling_number = 100
+    sampling_number = 1000
     source_number = 100
     print_screen = true
     execute_on = INITIAL

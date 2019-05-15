@@ -46,6 +46,8 @@ ViewFactor::execute()
   if (dim!=3)
     mooseError("ViewFactor UserObject can only be used for 3D geometry.");
 
+  // LOOPING OVER ELEMENTS ON THE MASTER BOUNDARY
+  // Define IDs
   Real viewfactor_elem_to_bnd{0};
   BoundaryID slave_bnd;
   BoundaryID master_bnd = _mesh.getBoundaryIDs(_current_elem, _current_side)[0];
@@ -54,23 +56,12 @@ ViewFactor::execute()
   for (const auto & elem : _elem_side_map)
   {
     unsigned int slave_elem = elem.first;   //slave_elem id el->id()
-    // if (master_elem == slave_elem)     //element can not see itself
-    //   continue;
+    if (master_elem == slave_elem)     //element side can not see itself
+      continue;
     Elem * el = _mesh.elemPtr(elem.first);  //elem ptr for slave elem
     unsigned int slave_side = elem.second;  //slave_side id
     slave_bnd = _mesh.getBoundaryIDs(el,slave_side)[0];  //slave_bnd id
     _slave_side_map = getSideMap(el,slave_side);   //slave side node coordinates
-    if (_viewfactors_map[slave_bnd][master_bnd][slave_elem][master_elem]!=0)    //use reciprocity of viewfactors
-    {
-      Real master_side_area = getArea(getCenterPoint(_master_side_map),_master_side_map);
-      Real slave_side_area = getArea(getCenterPoint(_slave_side_map),_slave_side_map);
-      Real afsm = slave_side_area/master_side_area;
-      Real Fsm = _viewfactors_map[slave_bnd][master_bnd][slave_elem][master_elem];
-      _viewfactors_map[master_bnd][slave_bnd][master_elem][slave_elem] = afsm * Fsm;
-      viewfactor_elem_to_bnd += afsm * Fsm;
-    }
-    else
-    {
       if (isVisible(_master_side_map,_slave_side_map))
       {
         Real viewfactor_elem_to_elem = 0;   //initialize viewFactor calculation
@@ -83,11 +74,9 @@ ViewFactor::execute()
       }
       else
       {
-        // std::cout<<"not visible"<<std::endl;
         _viewfactors_map[master_bnd][slave_bnd][master_elem][slave_elem] = 0;
         viewfactor_elem_to_bnd += 0;
       }
-    }
   }
 }
 
@@ -109,8 +98,12 @@ Real ViewFactor::getViewFactor(BoundaryID master_bnd, unsigned int master_elem, 
         if (_viewfactors_map.find(master_bnd)->second.find(slave_bnd)->second.find(master_elem)->second.find(slave_elem) != _viewfactors_map.find(master_bnd)->second.find(slave_bnd)->second.find(master_elem)->second.end())
           return (_viewfactors_map.find(master_bnd)->second.find(slave_bnd)->second.find(master_elem)->second.find(slave_elem)->second);
     else
+    {
+      std::cout<<"Boundaries: "<<master_bnd<<"->"<<slave_bnd<<std::endl;
       mooseError("Viewfactor requested for unknown slave boundary. Make sure UserObject is executed on INITIAL and boundaries are defined correctly in UserObject block.");
+    }
   }
+  std::cout<<"Boundaries: "<<master_bnd<<"-> "<<slave_bnd<<std::endl;
   mooseError("Viewfactor requested for unknown master boundary. Make sure UserObject is executed on INITIAL and boundaries are defined correctly in UserObject block.");
   return 0;   //satisfy compiler
 }

@@ -1,6 +1,6 @@
 [Mesh]
   type = FileMesh
-  file = parallel_blocks_coarse.e
+  file = parallel_blocks.e
 []
 [Variables]
   [./temp]

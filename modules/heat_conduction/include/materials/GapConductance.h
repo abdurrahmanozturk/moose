@@ -11,6 +11,7 @@
 #define GAPCONDUCTANCE_H
 
 #include "Material.h"
+#include "ViewFactor.h"
 
 /**
  * Generic gap heat transfer model, with h_gap =  h_conduction + h_contact + h_radiation
@@ -86,7 +87,6 @@ protected:
   Real _r2;
 
   bool _has_info;
-
   const VariableValue & _gap_distance_value;
   const VariableValue & _gap_temp_value;
   MaterialProperty<Real> & _gap_conductance;
@@ -108,7 +108,9 @@ protected:
   const NumericVector<Number> ** _serialized_solution;
   DofMap * _dof_map;
   const bool _warnings;
-
+  //
+  // const ViewFactor & _viewfactor;
+  //
   Point & _p1;
   Point & _p2;
 };

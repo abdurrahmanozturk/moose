@@ -80,10 +80,9 @@ RadiativeHeatFluxBC::computeQpResidual()
         _slave_elem_id = el->id();   //elem.first
         if (_master_elem_id == _slave_elem_id)
           continue;
-        std::map<unsigned int, std::vector<Real>> side_map{_viewfactor.getSideMap(el,side)};
-        const std::vector<Real> center = _viewfactor.getCenterPoint(side_map);
-        const Point point(center[0],center[1],center[2]);
-        _u_slave = _system.point_value(_var_number, point, false);
+        std::map<unsigned int, std::vector<Point>> side_map{_viewfactor.getSideMap(el,side)};
+        const Point center = _viewfactor.getCenterPoint(side_map);
+        _u_slave = _system.point_value(_var_number, center, false);
         Real temp_func_slave = _u_slave * _u_slave * _u_slave * _u_slave;
         Real f_ms = _viewfactor.getViewFactor(current_boundary_id,_master_elem_id, bnd_id, _slave_elem_id);
         q_ms = _emissivity[current_boundary_id] * _stefan_boltzmann * f_ms * temp_func_master; // master-slave : from Modest

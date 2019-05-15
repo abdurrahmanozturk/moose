@@ -103,6 +103,12 @@ GapConductance::actionParameters()
   params.addRangeCheckedParam<Real>(
       "max_gap", 1e6, "max_gap>=0", "A maximum gap (denominator) size");
 
+//
+// params.addParam<UserObjectName>("viewfactor_userobject",
+//                                 "The name of the UserObject that is "
+//                                 "used for view factor calculations.");
+//
+
   return params;
 }
 
@@ -143,6 +149,9 @@ GapConductance::GapConductance(const InputParameters & parameters)
     _serialized_solution(_quadrature ? &_temp_var->sys().currentSolution() : NULL),
     _dof_map(_quadrature ? &_temp_var->sys().dofMap() : NULL),
     _warnings(getParam<bool>("warnings")),
+    //
+    //_viewfactor(getUserObject<ViewFactor>("viewfactor_userobject")),
+    //
     _p1(declareRestartableData<Point>("cylinder_axis_point_1", Point(0, 1, 0))),
     _p2(declareRestartableData<Point>("cylinder_axis_point_2", Point(0, 0, 0)))
 {
