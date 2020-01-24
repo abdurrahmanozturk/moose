@@ -120,6 +120,6 @@
 
 [Outputs]
   exodus = true
-  file_base = radiation_heat_transfer
+  file_base = radiation_heat_transfer_out
   console = true
 []
